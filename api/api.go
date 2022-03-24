@@ -3,8 +3,8 @@ package api
 import (
 	"log"
 
-	"github.com/engineering/CodeInformation/api/codeinformation"
-	"github.com/engineering/CodeInformation/app"
+	"github.com/danilotadeu/r-customer-code-information/api/codeinformation"
+	"github.com/danilotadeu/r-customer-code-information/app"
 	"github.com/gofiber/fiber/v2"
 )
 

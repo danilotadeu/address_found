@@ -1,7 +1,7 @@
 package main
 
 import (
-	serverInit "github.com/engineering/CodeInformation/server"
+	serverInit "github.com/danilotadeu/r-customer-code-information/server"
 )
 
 var (

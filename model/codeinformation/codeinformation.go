@@ -16,6 +16,17 @@ type CodeInformationResponse struct {
 	CustomerCode string `json:"customerCode"`
 }
 
+type CodeInformationResponseError struct {
+	Description string   `json:"description"`
+	Provider    Provider `json:"provider"`
+}
+
+type Provider struct {
+	ServiceName  string `json:"serviceName"`
+	ErrorCode    string `json:"errorCode"`
+	ErrorMessage string `json:"errorMessage"`
+}
+
 type CodeInformationServiceResponse struct {
 	XMLName      xml.Name `xml:"customerRetrieveResponse"`
 	Text         string   `xml:",chardata"`

@@ -1,8 +1,8 @@
 package server
 
 import (
-	"github.com/engineering/CodeInformation/api"
-	"github.com/engineering/CodeInformation/app"
+	"github.com/danilotadeu/r-customer-code-information/api"
+	"github.com/danilotadeu/r-customer-code-information/app"
 	"github.com/gofiber/fiber/v2"
 )
 

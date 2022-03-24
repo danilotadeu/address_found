@@ -3,7 +3,7 @@ package app
 import (
 	"log"
 
-	"github.com/engineering/CodeInformation/app/codeinformation"
+	"github.com/danilotadeu/r-customer-code-information/app/codeinformation"
 )
 
 //Container ...
