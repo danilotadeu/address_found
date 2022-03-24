@@ -1,6 +1,7 @@
 package codeinformation
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/danilotadeu/r-customer-code-information/app"
@@ -47,6 +48,7 @@ func (p *apiImpl) CodeInformationHandler(c *fiber.Ctx) error {
 	ctx := c.Context()
 	customerCode, err := p.apps.CodeInformation.GetCodeInformation(ctx, requestCodeInformation, clientID, messageID)
 	if err != nil {
+		fmt.Println(err)
 		log.Println("api.codeinformation.codeinformation.codeinformation.get_code_information", err.Error())
 		return c.JSON(codeinformationModel.CodeInformationResponseError{
 			Description: err.Error(),

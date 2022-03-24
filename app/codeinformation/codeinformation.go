@@ -2,9 +2,12 @@ package codeinformation
 
 import (
 	"encoding/xml"
+	"errors"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
+	"strings"
 
 	codeinformationModel "github.com/danilotadeu/r-customer-code-information/model/codeinformation"
 	"github.com/valyala/fasthttp"
@@ -24,11 +27,24 @@ func NewApp() App {
 
 //GetCodeInformation get a information code in webservice...
 func (a appImpl) GetCodeInformation(ctx *fasthttp.RequestCtx, requestCodeInformation *codeinformationModel.CodeInformationRequest, clientID, messageID string) (*string, error) {
-	/*
-		TODO: Fazer o XML de envio e tratar erros de response
-		TODO: Mudar para requisição POST e envia body
-	*/
-	resp, err := http.Get("http://127.0.0.1:4000/v1/r-customer-code-information-service")
+	requestbody := codeinformationModel.CustomerRetrieveRequest{}
+	requestbody.Header.Security.UsernameToken.Username = "ADMX"
+	requestbody.Header.Security.UsernameToken.Password.Type = "ADMX"
+	if val, err := strconv.Atoi(requestCodeInformation.Customer.ID); err == nil {
+		requestbody.Body.CustomerRetrieveRequest.InputAttributes.CustomerRead.CsId = val
+		requestbody.Body.CustomerRetrieveRequest.InputAttributes.PaymentArrangementsRead.CsId = val
+		requestbody.Body.CustomerRetrieveRequest.InputAttributes.AddressesRead.CsId = val
+		requestbody.Body.CustomerRetrieveRequest.InputAttributes.CustomerInfoRead.CsId = val
+	}
+	requestbody.Body.CustomerRetrieveRequest.InputAttributes.CustomerRead.SyncWithDb = requestCodeInformation.Customer.SyncFlag
+	requestbody.Body.CustomerRetrieveRequest.SessionChangeRequest.Values.Item.Key = requestCodeInformation.UserID
+
+	body, err := xml.Marshal(requestbody)
+	if err != nil {
+		log.Println("app.codeinformation.codeinformation.codeinformation.xml_marshal", err.Error())
+		return nil, err
+	}
+	resp, err := http.Post("http://127.0.0.1:4000/v1/r-customer-code-information-service", "text/xml", strings.NewReader(string(body)))
 	if err != nil {
 		log.Println("app.codeinformation.codeinformation.codeinformation.body_parser", err.Error())
 		return nil, err
@@ -45,5 +61,9 @@ func (a appImpl) GetCodeInformation(ctx *fasthttp.RequestCtx, requestCodeInforma
 	var responseService codeinformationModel.CodeInformationServiceResponse
 	xml.Unmarshal(byteValue, &responseService)
 
-	return &responseService.CustomerRead.CsCode, nil
+	if responseService.Body.CustomerRetrieveResponse.CustomerRead.CsCode == "" {
+		return nil, errors.New("cs code empty")
+	}
+
+	return &responseService.Body.CustomerRetrieveResponse.CustomerRead.CsCode, nil
 }
