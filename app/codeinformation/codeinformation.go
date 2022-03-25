@@ -18,11 +18,17 @@ type App interface {
 	GetCodeInformation(ctx *fasthttp.RequestCtx, requestCodeInformation *codeinformationModel.CodeInformationRequest, clientID, messageID string) (*string, error)
 }
 
-type appImpl struct{}
+type appImpl struct {
+	urlProvider  string
+	portProvider string
+}
 
 //NewApp init a codeInformation
-func NewApp() App {
-	return &appImpl{}
+func NewApp(urlProvider, portProvider string) App {
+	return &appImpl{
+		urlProvider:  urlProvider,
+		portProvider: portProvider,
+	}
 }
 
 //GetCodeInformation get a information code in webservice...
@@ -44,7 +50,7 @@ func (a appImpl) GetCodeInformation(ctx *fasthttp.RequestCtx, requestCodeInforma
 		log.Println("app.codeinformation.codeinformation.codeinformation.xml_marshal", err.Error())
 		return nil, err
 	}
-	resp, err := http.Post("http://127.0.0.1:4000/v1/r-customer-code-information-service", "text/xml", strings.NewReader(string(body)))
+	resp, err := http.Post("http://"+a.urlProvider+":"+a.portProvider+"/v1/r-customer-code-information-service", "text/xml", strings.NewReader(string(body)))
 	if err != nil {
 		log.Println("app.codeinformation.codeinformation.codeinformation.body_parser", err.Error())
 		return nil, err
