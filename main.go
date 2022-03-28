@@ -1,9 +1,10 @@
 package main
 
 import (
-	"os"
+	"log"
 
 	serverInit "github.com/danilotadeu/r-customer-code-information/server"
+	"github.com/joho/godotenv"
 )
 
 var (
@@ -11,8 +12,10 @@ var (
 )
 
 func init() {
-	os.Setenv("URL_PROVIDER", "r-customer-code-information-provider-container")
-	os.Setenv("PORT_PROVIDER", "4000")
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	server = serverInit.New()
 }
 
