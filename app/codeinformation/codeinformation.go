@@ -1,21 +1,22 @@
 package codeinformation
 
 import (
+	"context"
 	"encoding/xml"
-	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	codeinformationModel "github.com/danilotadeu/r-customer-code-information/model/codeinformation"
-	"github.com/valyala/fasthttp"
 )
 
 //App is a contract to CodeInformation..
 type App interface {
-	GetCodeInformation(ctx *fasthttp.RequestCtx, requestCodeInformation *codeinformationModel.CodeInformationRequest, clientID, messageID string) (*string, error)
+	GetCodeInformation(ctx context.Context, requestCodeInformation *codeinformationModel.CodeInformationRequest) (*codeinformationModel.CodeInformationServiceResponse, error)
 }
 
 type appImpl struct {
@@ -32,7 +33,7 @@ func NewApp(urlProvider, portProvider string) App {
 }
 
 //GetCodeInformation get a information code in webservice...
-func (a appImpl) GetCodeInformation(ctx *fasthttp.RequestCtx, requestCodeInformation *codeinformationModel.CodeInformationRequest, clientID, messageID string) (*string, error) {
+func (a appImpl) GetCodeInformation(ctx context.Context, requestCodeInformation *codeinformationModel.CodeInformationRequest) (*codeinformationModel.CodeInformationServiceResponse, error) {
 	requestbody := codeinformationModel.CustomerRetrieveRequest{}
 	requestbody.Header.Security.UsernameToken.Username = "ADMX"
 	requestbody.Header.Security.UsernameToken.Password.Type = "ADMX"
@@ -50,26 +51,44 @@ func (a appImpl) GetCodeInformation(ctx *fasthttp.RequestCtx, requestCodeInforma
 		log.Println("app.codeinformation.codeinformation.codeinformation.xml_marshal", err.Error())
 		return nil, err
 	}
-	resp, err := http.Post("http://"+a.urlProvider+":"+a.portProvider+"/v1/r-customer-code-information-service", "text/xml", strings.NewReader(string(body)))
+
+	//LOG AQUI
+	url := fmt.Sprintf("http://%s:%s/v1/r-customer-code-information-service", a.urlProvider, a.portProvider)
+	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(string(body)))
+	req.Header.Add("Content-Type", "text/xml")
 	if err != nil {
-		log.Println("app.codeinformation.codeinformation.codeinformation.body_parser", err.Error())
+		log.Println("app.codeinformation.codeinformation.codeinformation.new_request", err.Error())
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	req = req.WithContext(ctx)
+	client := http.DefaultClient
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println("app.codeinformation.codeinformation.codeinformation.do", err.Error())
 		return nil, err
 	}
 
 	defer resp.Body.Close()
 
-	byteValue, err := ioutil.ReadAll(resp.Body)
+	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Println("app.codeinformation.codeinformation.codeinformation.ioutil_readall", err.Error())
 		return nil, err
 	}
 
-	var responseService codeinformationModel.CodeInformationServiceResponse
-	xml.Unmarshal(byteValue, &responseService)
+	/*
+		fazer unmarshal com map interface e verificar se existe tag
+	*/
 
-	if responseService.Body.CustomerRetrieveResponse.CustomerRead.CsCode == "" {
-		return nil, errors.New("cs code empty")
+	var responseService codeinformationModel.CodeInformationServiceResponse
+	err = xml.Unmarshal(data, &responseService)
+	if err != nil {
+		log.Println("app.codeinformation.codeinformation.codeinformation.xml_unmarshal", err.Error())
+		return nil, err
 	}
 
-	return &responseService.Body.CustomerRetrieveResponse.CustomerRead.CsCode, nil
+	return &responseService, nil
 }

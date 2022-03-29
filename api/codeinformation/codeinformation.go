@@ -1,12 +1,19 @@
 package codeinformation
 
 import (
+	"context"
 	"log"
+	"time"
 
 	"github.com/danilotadeu/r-customer-code-information/app"
 	codeinformationModel "github.com/danilotadeu/r-customer-code-information/model/codeinformation"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+)
+
+const (
+	messageIDC = "Messageid"
+	clientIDC  = "clientId"
 )
 
 type apiImpl struct {
@@ -31,21 +38,26 @@ func (p *apiImpl) CodeInformationHandler(c *fiber.Ctx) error {
 
 	headers := c.GetReqHeaders()
 	var clientID string
-	if val, ok := headers["clientId"]; ok {
+	if val, ok := headers[clientIDC]; ok {
 		clientID = val
-	} else {
-		clientID = uuid.New().String()
 	}
 
 	var messageID string
-	if val, ok := headers["messageId"]; ok {
+	if val, ok := headers[messageIDC]; ok {
 		messageID = val
 	} else {
 		messageID = uuid.New().String()
 	}
+	c.Set(messageIDC, messageID)
 
-	ctx := c.Context()
-	customerCode, err := p.apps.CodeInformation.GetCodeInformation(ctx, requestCodeInformation, clientID, messageID)
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, clientIDC, clientID)
+	ctx = context.WithValue(ctx, messageIDC, messageID)
+	ctx, cancel := context.WithTimeout(ctx, 1*time.Second)
+	defer cancel()
+
+	//LOG AQUI
+	customer, err := p.apps.CodeInformation.GetCodeInformation(ctx, requestCodeInformation)
 	if err != nil {
 		log.Println("api.codeinformation.codeinformation.codeinformation.get_code_information", err.Error())
 		return c.JSON(codeinformationModel.CodeInformationResponseError{
@@ -57,8 +69,12 @@ func (p *apiImpl) CodeInformationHandler(c *fiber.Ctx) error {
 			},
 		})
 	}
+	/*
+		Entrada na api
 
+	*/
+	//LOG AQUI
 	return c.JSON(codeinformationModel.CodeInformationResponse{
-		CustomerCode: *customerCode,
+		CustomerCode: customer.Transform(),
 	})
 }

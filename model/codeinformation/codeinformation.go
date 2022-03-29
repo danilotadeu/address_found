@@ -475,3 +475,7 @@ type CodeInformationServiceResponse struct {
 		} `xml:"customerRetrieveResponse"`
 	} `xml:"Body"`
 }
+
+func (customer *CodeInformationServiceResponse) Transform() string {
+	return customer.Body.CustomerRetrieveResponse.CustomerRead.CsCode
+}
