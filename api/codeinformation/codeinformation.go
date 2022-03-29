@@ -69,10 +69,6 @@ func (p *apiImpl) CodeInformationHandler(c *fiber.Ctx) error {
 			},
 		})
 	}
-	/*
-		Entrada na api
-
-	*/
 	//LOG AQUI
 	return c.JSON(codeinformationModel.CodeInformationResponse{
 		CustomerCode: customer.Transform(),
