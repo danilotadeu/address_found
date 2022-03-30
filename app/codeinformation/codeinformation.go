@@ -2,6 +2,7 @@ package codeinformation
 
 import (
 	"context"
+	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
@@ -14,9 +15,14 @@ import (
 	codeinformationModel "github.com/danilotadeu/r-customer-code-information/model/codeinformation"
 )
 
+const (
+	contentType      = "Content-Type"
+	contentTypeValue = "text/xml"
+)
+
 //App is a contract to CodeInformation..
 type App interface {
-	GetCodeInformation(ctx context.Context, requestCodeInformation *codeinformationModel.CodeInformationRequest) (*codeinformationModel.CodeInformationServiceResponse, error)
+	GetCodeInformation(ctx context.Context, requestCodeInformation *codeinformationModel.CodeInformationRequest) (interface{}, error)
 }
 
 type appImpl struct {
@@ -33,7 +39,7 @@ func NewApp(urlProvider, portProvider string) App {
 }
 
 //GetCodeInformation get a information code in webservice...
-func (a appImpl) GetCodeInformation(ctx context.Context, requestCodeInformation *codeinformationModel.CodeInformationRequest) (*codeinformationModel.CodeInformationServiceResponse, error) {
+func (a appImpl) GetCodeInformation(ctx context.Context, requestCodeInformation *codeinformationModel.CodeInformationRequest) (interface{}, error) {
 	requestbody := codeinformationModel.CustomerRetrieveRequest{}
 	requestbody.Header.Security.UsernameToken.Username = "ADMX"
 	requestbody.Header.Security.UsernameToken.Password.Type = "ADMX"
@@ -52,9 +58,9 @@ func (a appImpl) GetCodeInformation(ctx context.Context, requestCodeInformation 
 		return nil, err
 	}
 
-	//LOG AQUI
 	url := fmt.Sprintf("http://%s:%s/v1/r-customer-code-information-service", a.urlProvider, a.portProvider)
 	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(string(body)))
+
 	req.Header.Add("Content-Type", "text/xml")
 	if err != nil {
 		log.Println("app.codeinformation.codeinformation.codeinformation.new_request", err.Error())
@@ -65,6 +71,17 @@ func (a appImpl) GetCodeInformation(ctx context.Context, requestCodeInformation 
 	defer cancel()
 	req = req.WithContext(ctx)
 	client := http.DefaultClient
+
+	/* LOG INICIO */
+	now := time.Now()
+	formatted := fmt.Sprintf("%d%02d%02d%02d%02d%02d", now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), now.Second())
+	log.Println("    INFO    EngDB | Engineering | GMID |  | - | ENGNB003153 | rCustomerCodeInformationService | 1 | - | - | " + formatted + " | - | - | [rCustomerCodeInformationService] |  input: {'msisdn':'123'}")
+	timeDur := 5 * time.Second
+	log.Println("    DEBUG    EngDB | Engineering | GMID |  | - | ENGNB003153 | rCustomerCodeInformationService | 1 | - | - | " + formatted + " | - | - | Http Provider request | TIMEOUT[" + strconv.Itoa(int(timeDur.Seconds())) + "] METHOD[POST] URL[" + url + "]")
+	payload, _ := json.Marshal(requestbody)
+	log.Println("    DEBUG    EngDB | Engineering | GMID |  | - | ENGNB003153 | rCustomerCodeInformationService | 1 | - | - | " + formatted + " | - | - | request body | " + string(payload))
+	log.Println("    DEBUG    EngDB | Engineering | GMID |  | - | ENGNB003153 | rCustomerCodeInformationService | 1 | - | - | " + formatted + " | - | - | provider header | [" + contentType + ", " + contentTypeValue + "]")
+	/* LOG FIM */
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Println("app.codeinformation.codeinformation.codeinformation.do", err.Error())
@@ -79,16 +96,26 @@ func (a appImpl) GetCodeInformation(ctx context.Context, requestCodeInformation 
 		return nil, err
 	}
 
-	/*
-		fazer unmarshal com map interface e verificar se existe tag
-	*/
+	if resp.StatusCode == http.StatusOK {
+		var responseService codeinformationModel.CodeInformationServiceResponse
+		err = xml.Unmarshal(data, &responseService)
+		responseProviderJSON, _ := json.Marshal(responseService)
+		log.Println("    DEBUG    EngDB | Engineering | GMID |  | - | ENGNB003153 | rCustomerCodeInformationService | 1 | - | - | " + formatted + " | - | - | out | " + string(responseProviderJSON))
+		if err != nil {
+			log.Println("app.codeinformation.codeinformation.codeinformation.xml_unmarshal", err.Error())
+			return nil, err
+		}
 
-	var responseService codeinformationModel.CodeInformationServiceResponse
-	err = xml.Unmarshal(data, &responseService)
-	if err != nil {
-		log.Println("app.codeinformation.codeinformation.codeinformation.xml_unmarshal", err.Error())
-		return nil, err
+		return &responseService, nil
 	}
 
+	var responseService codeinformationModel.CodeInformationResponseProviderError
+	err = xml.Unmarshal(data, &responseService)
+	responseProviderJSON, _ := json.Marshal(responseService)
+	log.Println("    DEBUG    EngDB | Engineering | GMID |  | - | ENGNB003153 | rCustomerCodeInformationService | 1 | - | - | " + formatted + " | - | - | out | " + string(responseProviderJSON))
+	if err != nil {
+		log.Println("app.codeinformation.codeinformation.codeinformation.xml_unmarshal_provider_error", err.Error())
+		return nil, err
+	}
 	return &responseService, nil
 }

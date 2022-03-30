@@ -2,6 +2,8 @@ package codeinformation
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"log"
 	"time"
 
@@ -56,7 +58,18 @@ func (p *apiImpl) CodeInformationHandler(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(ctx, 1*time.Second)
 	defer cancel()
 
-	//LOG AQUI
+	/*LOG INICIO*/
+	now := time.Now()
+	formatted := fmt.Sprintf("%d%02d%02d%02d%02d%02d", now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), now.Second())
+	log.Println("Log one startup Level [debug]")
+	log.Println("    INFO    EngDB | Engineering | GMID |  | - | ENGNB003153 | orch-c-billing-profile | 1 | - | - | " + formatted + " | - | - | requestStarting | HTTP ID []")
+	headersJSON, _ := json.Marshal(headers)
+	log.Println("    DEBUG    EngDB | Engineering | GMID |  | - | ENGNB003153 | orch-c-billing-profile | 1 | - | - | " + formatted + " | - | - | requestHeaderReceived | " + string(headersJSON))
+	payload, _ := json.Marshal(requestCodeInformation)
+	log.Println("    DEBUG    EngDB | Engineering | GMID |  | - | ENGNB003153 | orch-c-billing-profile | 1 | - | - | " + formatted + " | - | - | requestPayloadReceived | " + string(payload))
+	log.Println("    DEBUG    EngDB | Engineering | GMID |  | - | ENGNB003153 | orch-c-billing-profile | 1 | - | - | " + formatted + " | - | - | requestUriReceived | POST - /v1/r-customer-code-information")
+	/*LOG FIM*/
+
 	customer, err := p.apps.CodeInformation.GetCodeInformation(ctx, requestCodeInformation)
 	if err != nil {
 		log.Println("api.codeinformation.codeinformation.codeinformation.get_code_information", err.Error())
@@ -69,8 +82,25 @@ func (p *apiImpl) CodeInformationHandler(c *fiber.Ctx) error {
 			},
 		})
 	}
-	//LOG AQUI
-	return c.JSON(codeinformationModel.CodeInformationResponse{
-		CustomerCode: customer.Transform(),
+
+	responseCustomer, ok := customer.(*codeinformationModel.CodeInformationServiceResponse)
+	if ok {
+		responseAdapter, _ := json.Marshal(responseCustomer)
+		log.Println("    DEBUG    EngDB | Engineering | GMID |  | - | ENGNB003153 | orch-c-billing-profile | 1 | - | - | " + formatted + " | - | - | responseAdapter | " + string(responseAdapter))
+		return c.JSON(codeinformationModel.CodeInformationResponse{
+			CustomerCode: responseCustomer.Transform(),
+		})
+	}
+
+	responseCustomerErr, _ := customer.(*codeinformationModel.CodeInformationResponseProviderError)
+	responseAdapter, _ := json.Marshal(responseCustomerErr)
+	log.Println("    DEBUG    EngDB | Engineering | GMID |  | - | ENGNB003153 | orch-c-billing-profile | 1 | - | - | " + formatted + " | - | - | responseAdapter | " + string(responseAdapter))
+	return c.JSON(codeinformationModel.CodeInformationResponseError{
+		Description: responseCustomerErr.Body.Fault.Faultstring.Text,
+		Provider: codeinformationModel.Provider{
+			ServiceName:  "r-customer-code-information",
+			ErrorCode:    responseCustomerErr.Body.Fault.Faultcode.Ns0,
+			ErrorMessage: responseCustomerErr.Body.Fault.Faultstring.Text,
+		},
 	})
 }
