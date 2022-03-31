@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/danilotadeu/r-customer-code-information/app"
@@ -37,7 +38,6 @@ func (p *apiImpl) CodeInformationHandler(c *fiber.Ctx) error {
 		log.Println("api.codeinformation.codeinformation.codeinformation.body_parser", err.Error())
 		return err
 	}
-
 	headers := c.GetReqHeaders()
 	var clientID string
 	if val, ok := headers[clientIDC]; ok {
@@ -73,7 +73,7 @@ func (p *apiImpl) CodeInformationHandler(c *fiber.Ctx) error {
 	customer, err := p.apps.CodeInformation.GetCodeInformation(ctx, requestCodeInformation)
 	if err != nil {
 		log.Println("api.codeinformation.codeinformation.codeinformation.get_code_information", err.Error())
-		return c.JSON(codeinformationModel.CodeInformationResponseError{
+		return c.Status(http.StatusBadRequest).JSON(codeinformationModel.CodeInformationResponseError{
 			Description: err.Error(),
 			Provider: codeinformationModel.Provider{
 				ServiceName:  "r-customer-code-information",
@@ -94,8 +94,10 @@ func (p *apiImpl) CodeInformationHandler(c *fiber.Ctx) error {
 
 	responseCustomerErr, _ := customer.(*codeinformationModel.CodeInformationResponseProviderError)
 	responseAdapter, _ := json.Marshal(responseCustomerErr)
+
 	log.Println("    DEBUG    EngDB | Engineering | GMID |  | - | ENGNB003153 | orch-c-billing-profile | 1 | - | - | " + formatted + " | - | - | responseAdapter | " + string(responseAdapter))
-	return c.JSON(codeinformationModel.CodeInformationResponseError{
+
+	return c.Status(http.StatusBadRequest).JSON(codeinformationModel.CodeInformationResponseError{
 		Description: responseCustomerErr.Body.Fault.Faultstring.Text,
 		Provider: codeinformationModel.Provider{
 			ServiceName:  "r-customer-code-information",

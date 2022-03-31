@@ -42,7 +42,7 @@ func NewApp(urlProvider, portProvider string) App {
 func (a appImpl) GetCodeInformation(ctx context.Context, requestCodeInformation *codeinformationModel.CodeInformationRequest) (interface{}, error) {
 	requestbody := codeinformationModel.CustomerRetrieveRequest{}
 	requestbody.Header.Security.UsernameToken.Username = "ADMX"
-	requestbody.Header.Security.UsernameToken.Password.Type = "ADMX"
+	requestbody.Header.Security.UsernameToken.Password.Type = requestCodeInformation.Password
 	if val, err := strconv.Atoi(requestCodeInformation.Customer.ID); err == nil {
 		requestbody.Body.CustomerRetrieveRequest.InputAttributes.CustomerRead.CsId = val
 		requestbody.Body.CustomerRetrieveRequest.InputAttributes.PaymentArrangementsRead.CsId = val

@@ -5,6 +5,7 @@ import "encoding/xml"
 //CodeInformationRequest is a struct to request
 type CodeInformationRequest struct {
 	UserID   string `json:"userId"`
+	Password string `json:"password,omitempty"`
 	Customer struct {
 		ID       string `json:"id"`
 		SyncFlag bool   `json:"syncFlag"`
