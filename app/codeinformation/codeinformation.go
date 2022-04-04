@@ -79,7 +79,6 @@ func (a appImpl) GetCodeInformation(ctx context.Context, requestCodeInformation 
 		log.Println("app.codeinformation.codeinformation.codeinformation.do", err.Error())
 		return nil, err
 	}
-
 	defer resp.Body.Close()
 
 	data, err := ioutil.ReadAll(resp.Body)

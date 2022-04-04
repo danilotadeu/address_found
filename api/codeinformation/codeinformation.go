@@ -62,12 +62,12 @@ func (p *apiImpl) CodeInformationHandler(c *fiber.Ctx) error {
 	now := time.Now()
 	formatted := fmt.Sprintf("%d%02d%02d%02d%02d%02d", now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), now.Second())
 	log.Println("Log one startup Level [debug]")
-	log.Println("    INFO    EngDB | Engineering | GMID |  | - | ENGNB003153 | orch-c-billing-profile | 1 | - | - | " + formatted + " | - | - | requestStarting | HTTP ID []")
+	log.Println("    INFO    EngDB | Engineering | GMID |  | - | ENGNB003153 | orch-r-customer-code-information | 1 | - | - | " + formatted + " | - | - | requestStarting | HTTP ID []")
 	headersJSON, _ := json.Marshal(headers)
-	log.Println("    DEBUG    EngDB | Engineering | GMID |  | - | ENGNB003153 | orch-c-billing-profile | 1 | - | - | " + formatted + " | - | - | requestHeaderReceived | " + string(headersJSON))
+	log.Println("    DEBUG    EngDB | Engineering | GMID |  | - | ENGNB003153 | orch-r-customer-code-information | 1 | - | - | " + formatted + " | - | - | requestHeaderReceived | " + string(headersJSON))
 	payload, _ := json.Marshal(requestCodeInformation)
-	log.Println("    DEBUG    EngDB | Engineering | GMID |  | - | ENGNB003153 | orch-c-billing-profile | 1 | - | - | " + formatted + " | - | - | requestPayloadReceived | " + string(payload))
-	log.Println("    DEBUG    EngDB | Engineering | GMID |  | - | ENGNB003153 | orch-c-billing-profile | 1 | - | - | " + formatted + " | - | - | requestUriReceived | POST - /v1/r-customer-code-information")
+	log.Println("    DEBUG    EngDB | Engineering | GMID |  | - | ENGNB003153 | orch-r-customer-code-information | 1 | - | - | " + formatted + " | - | - | requestPayloadReceived | " + string(payload))
+	log.Println("    DEBUG    EngDB | Engineering | GMID |  | - | ENGNB003153 | orch-r-customer-code-information | 1 | - | - | " + formatted + " | - | - | requestUriReceived | POST - /v1/r-customer-code-information")
 	/*LOG FIM*/
 
 	customer, err := p.apps.CodeInformation.GetCodeInformation(ctx, requestCodeInformation)
@@ -86,7 +86,7 @@ func (p *apiImpl) CodeInformationHandler(c *fiber.Ctx) error {
 	responseCustomer, ok := customer.(*codeinformationModel.CodeInformationServiceResponse)
 	if ok {
 		responseAdapter, _ := json.Marshal(responseCustomer)
-		log.Println("    DEBUG    EngDB | Engineering | GMID |  | - | ENGNB003153 | orch-c-billing-profile | 1 | - | - | " + formatted + " | - | - | responseAdapter | " + string(responseAdapter))
+		log.Println("    DEBUG    EngDB | Engineering | GMID |  | - | ENGNB003153 | orch-r-customer-code-information | 1 | - | - | " + formatted + " | - | - | responseAdapter | " + string(responseAdapter))
 		return c.JSON(codeinformationModel.CodeInformationResponse{
 			CustomerCode: responseCustomer.Transform(),
 		})
@@ -95,7 +95,7 @@ func (p *apiImpl) CodeInformationHandler(c *fiber.Ctx) error {
 	responseCustomerErr, _ := customer.(*codeinformationModel.CodeInformationResponseProviderError)
 	responseAdapter, _ := json.Marshal(responseCustomerErr)
 
-	log.Println("    DEBUG    EngDB | Engineering | GMID |  | - | ENGNB003153 | orch-c-billing-profile | 1 | - | - | " + formatted + " | - | - | responseAdapter | " + string(responseAdapter))
+	log.Println("    DEBUG    EngDB | Engineering | GMID |  | - | ENGNB003153 | orch-r-customer-code-information | 1 | - | - | " + formatted + " | - | - | responseAdapter | " + string(responseAdapter))
 
 	return c.Status(http.StatusBadRequest).JSON(codeinformationModel.CodeInformationResponseError{
 		Description: responseCustomerErr.Body.Fault.Faultstring.Text,
