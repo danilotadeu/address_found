@@ -22,3 +22,8 @@ curl --location --request POST 'http://127.0.0.1:3000/v1/r-customer-code-informa
     }
 }'
 
+## Tests ##
+
+- Para rodar os testes, rodar o comando abaixo:
+
+go test -timeout 30s -run ^Test_apiImpl_CodeInformationHandler$ github.com/danilotadeu/r-customer-code-information/api/codeinformation
