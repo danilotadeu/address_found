@@ -8,7 +8,10 @@ RUN go mod download
 COPY . .
 # Build app
 RUN go build
+
+RUN apk add make
+
 # Expose port
 EXPOSE 3000
 # Start app
-CMD ./r-customer-code-information
+CMD ./pismo

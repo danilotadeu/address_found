@@ -1,29 +1,60 @@
-# r-customer-code-information #
+# Pismo Transactions #
 
-- Serviço construído para consumir uma api do serviço r-customer-code-information-provider.
+- Service to manage accounts and transactions.
 
-## Como rodar a aplicação ##
+## How to run aplication ? ##
 
-- Para rodar a aplicação localmente, utilizar somente o comando "make run-watch", 
-o serviço estará disponível na porta :3000
+- To run aplication, follow next steps:
 
-## CURL para efetuar a chamada no serviço ##
+```
+1 - Install package: https://github.com/golang-migrate/migrate according to your OS.
+```
 
-curl --location --request POST 'http://127.0.0.1:3000/v1/r-customer-code-information' \
---header 'clientId: 123' \
---header 'messageId: 123456' \
---header 'Authorization: Bearer omcauckqoiy6jyzgsxu6gi7sxh' \
+```
+$ docker-compose up
+```
+
+``` 
+$ make migrateup
+```
+
+## CURL to call api to create accounts ##
+
+``` 
+$ curl --location --request POST 'http://127.0.0.1:3000/accounts' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-    "userId": "F8036589",
-    "customer": {
-        "id": "116084470",
-        "syncFlag": false
-    }
+    "document_number":"19345678910"
 }'
+``` 
+
+## CURL to call api to create transactions ##
+
+``` 
+$ curl --location --request POST 'http://127.0.0.1:3000/transactions' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "account_id":1,
+    "operation_type_id":4,
+    "amount":1
+}'
+``` 
+
+## CURL to call api to get account ##
+
+``` 
+$ curl --location --request GET 'http://127.0.0.1:3000/accounts/1' \
+--header 'Content-Type: application/json'
+``` 
 
 ## Tests ##
 
-- Para rodar os testes, rodar o comando abaixo:
+- To run tests, follow steps:
 
-go test -timeout 30s -run ^Test_apiImpl_CodeInformationHandler$ github.com/danilotadeu/r-customer-code-information/api/codeinformation
+``` 
+cd app/transaction && go test -timeout 30s -run ^TestCreateTransaction
+``` 
+
+``` 
+cd api/transaction && go test -timeout 30s -run ^TestTransactionHandler
+``` 

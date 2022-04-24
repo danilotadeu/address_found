@@ -3,8 +3,9 @@ package server
 import (
 	"os"
 
-	"github.com/danilotadeu/r-customer-code-information/api"
-	"github.com/danilotadeu/r-customer-code-information/app"
+	"github.com/danilotadeu/pismo/api"
+	"github.com/danilotadeu/pismo/app"
+	"github.com/danilotadeu/pismo/store"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -16,6 +17,7 @@ type Server interface {
 type server struct {
 	Fiber *fiber.App
 	App   *app.Container
+	Store *store.Container
 }
 
 // New is instance the server
@@ -24,7 +26,8 @@ func New() Server {
 }
 
 func (e *server) Start() {
-	e.App = app.Register()
+	e.Store = store.Register()
+	e.App = app.Register(e.Store)
 	e.Fiber = api.Register(e.App)
-	e.Fiber.Listen(":"+os.Getenv("PORT"))
+	e.Fiber.Listen(":" + os.Getenv("PORT"))
 }

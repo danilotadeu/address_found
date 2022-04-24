@@ -2,20 +2,23 @@ package app
 
 import (
 	"log"
-	"os"
 
-	"github.com/danilotadeu/r-customer-code-information/app/codeinformation"
+	"github.com/danilotadeu/pismo/app/account"
+	"github.com/danilotadeu/pismo/app/transaction"
+	"github.com/danilotadeu/pismo/store"
 )
 
 //Container ...
 type Container struct {
-	CodeInformation codeinformation.App
+	Account     account.App
+	Transaction transaction.App
 }
 
 //Register app container
-func Register() *Container {
+func Register(store *store.Container) *Container {
 	container := &Container{
-		CodeInformation: codeinformation.NewApp(os.Getenv("URL_PROVIDER"), os.Getenv("PORT_PROVIDER")),
+		Account:     account.NewApp(store),
+		Transaction: transaction.NewApp(store),
 	}
 	log.Println("Registered -> App")
 	return container

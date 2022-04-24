@@ -1,0 +1,7 @@
+BEGIN;
+
+DROP TABLE IF EXISTS transactions;
+DROP TABLE IF EXISTS operations_types;
+DROP TABLE IF EXISTS accounts;
+
+COMMIT;
