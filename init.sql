@@ -1,4 +1,4 @@
-BEGIN;
+CREATE DATABASE IF NOT EXISTS pismo;
 
 CREATE TABLE IF NOT EXISTS `pismo`.`accounts` (
   `id` INT NOT NULL AUTO_INCREMENT,
@@ -37,5 +37,3 @@ INSERT INTO `pismo`.`operations_types`(`description`) VALUES ('COMPRA A VISTA');
 INSERT INTO `pismo`.`operations_types`(`description`) VALUES ('COMPRA PARCELADA');
 INSERT INTO `pismo`.`operations_types`(`description`) VALUES ('SAQUE');
 INSERT INTO `pismo`.`operations_types`(`description`) VALUES ('PAGAMENTO');
-
-COMMIT;

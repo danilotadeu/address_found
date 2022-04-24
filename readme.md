@@ -7,15 +7,11 @@
 - To run aplication, follow next steps:
 
 ```
-1 - Install package: https://github.com/golang-migrate/migrate according to your OS.
+$ cp .env-example .env
 ```
 
 ```
 $ docker-compose up
-```
-
-``` 
-$ make migrateup
 ```
 
 ## CURL to call api to create accounts ##

@@ -22,10 +22,11 @@ services:
       MYSQL_USER: go_test
       MYSQL_PASSWORD: pismo123
       # TZ: 'Asia/Tokyo'
-    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    command: --init-file /data/application/init.sql
     volumes:
       - db-data:/var/lib/mysql
       - ./db/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./init.sql:/data/application/init.sql
     ports:
       - 3306:3306
 
