@@ -4,7 +4,7 @@
 
 ## How to run application ? ##
 
-- To run aplication, follow next steps:
+- To run application, follow next steps:
 
 ```
 $ cp .env-example .env
