@@ -2,7 +2,7 @@
 
 - Service to manage accounts and transactions.
 
-## How to run aplication ? ##
+## How to run application ? ##
 
 - To run aplication, follow next steps:
 
