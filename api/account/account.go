@@ -41,7 +41,7 @@ func (p *apiImpl) accountCreate(c *fiber.Ctx) error {
 	validate := validator.New()
 	if err := validate.Struct(bodyAccount); err != nil {
 		return c.Status(http.StatusBadRequest).JSON(errorsP.ErrorsResponse{
-			Message: err.Error(),
+			Message: "O campo document number é obrigatório e necessita no mínimo 11 caracteres",
 		})
 	}
 

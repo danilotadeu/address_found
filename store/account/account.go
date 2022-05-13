@@ -48,12 +48,11 @@ func (a *storeImpl) StoreCreateAccount(ctx context.Context, documentNumber strin
 //GetAccount get a account..
 func (a *storeImpl) GetAccount(ctx context.Context, accountId int64) (*accountModel.AccountResultQuery, error) {
 	res, err := a.db.Query("SELECT * FROM accounts WHERE id = ?", accountId)
-	defer res.Close()
-
 	if err != nil {
 		log.Println("store.account.GetAccount.Query", err.Error())
 		return nil, err
 	}
+	defer res.Close()
 
 	if res.Next() {
 		var account accountModel.AccountResultQuery
@@ -71,12 +70,11 @@ func (a *storeImpl) GetAccount(ctx context.Context, accountId int64) (*accountMo
 //GetAccount get a account by document number..
 func (a *storeImpl) GetAccountByDocumentNumber(ctx context.Context, documentNumber string) (*accountModel.AccountCountResultQuery, error) {
 	res, err := a.db.Query("SELECT COUNT(*) as count FROM accounts WHERE document_number = ?", documentNumber)
-	defer res.Close()
-
 	if err != nil {
 		log.Println("store.account.GetAccountByDocumentNumber.Query", err.Error())
 		return nil, err
 	}
+	defer res.Close()
 
 	if res.Next() {
 		var count accountModel.AccountCountResultQuery
