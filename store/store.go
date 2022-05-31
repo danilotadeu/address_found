@@ -25,6 +25,12 @@ func Register() *Container {
 		panic(err)
 	}
 
+	if err = db.Ping(); err != nil {
+		db.Close()
+		log.Println("error db.Ping(): ", err.Error())
+		panic(err)
+	}
+
 	container := &Container{
 		Account:     account.NewStore(db),
 		Transaction: transaction.NewStore(db),

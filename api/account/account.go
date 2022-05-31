@@ -34,7 +34,7 @@ func (p *apiImpl) accountCreate(c *fiber.Ctx) error {
 	if err := c.BodyParser(bodyAccount); err != nil {
 		log.Println("api.account.accountCreate.body_parser", err.Error())
 		return c.Status(http.StatusInternalServerError).JSON(errorsP.ErrorsResponse{
-			Message: "Por favor tente mais tarde...",
+			Message: "Por favor enviar o document number como string.",
 		})
 	}
 
