@@ -18,17 +18,19 @@ type Container struct {
 }
 
 //Register store container
-func Register() *Container {
+func Register() (*Container, *sql.DB) {
 	connectionMysql := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?multiStatements=true", os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_DATABASE"))
 	db, err := sql.Open("mysql", connectionMysql)
 	if err != nil {
 		panic(err)
 	}
 
-	if err = db.Ping(); err != nil {
-		db.Close()
-		log.Println("error db.Ping(): ", err.Error())
-		panic(err)
+	if os.Getenv("DB_HOST") != "" {
+		if err = db.Ping(); err != nil {
+			db.Close()
+			log.Println("error db.Ping(): ", err.Error())
+			panic(err)
+		}
 	}
 
 	container := &Container{
@@ -37,5 +39,5 @@ func Register() *Container {
 	}
 
 	log.Println("Registered -> Store")
-	return container
+	return container, db
 }
