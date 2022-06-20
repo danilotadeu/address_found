@@ -6,9 +6,8 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/danilotadeu/pismo/api/account"
-	"github.com/danilotadeu/pismo/api/transaction"
-	"github.com/danilotadeu/pismo/app"
+	"github.com/danilotadeu/address_found/api/address"
+	"github.com/danilotadeu/address_found/app"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -24,10 +23,8 @@ func Register(apps *app.Container) *fiber.App {
 		_ = fiberRoute.Shutdown()
 	}()
 
-	// Accounts
-	account.NewAPI(fiberRoute.Group("/accounts"), apps)
-	// Transactions
-	transaction.NewAPI(fiberRoute.Group("/transactions"), apps)
+	// Address
+	address.NewAPI(fiberRoute.Group("/address"), apps)
 
 	log.Println("Registered -> Api")
 	return fiberRoute

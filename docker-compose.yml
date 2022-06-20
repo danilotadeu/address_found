@@ -8,28 +8,6 @@ services:
     stdin_open: true
     tty: true
     volumes:
-      - .:/pismo
+      - .:/address_found
     ports:
       - 3000:3000
-    depends_on:
-      - "db"
-
-  db:
-    image: mariadb:10.5.8
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: pismo
-      MYSQL_USER: go_test
-      MYSQL_PASSWORD: pismo123
-      # TZ: 'Asia/Tokyo'
-    command: --init-file /data/application/init.sql
-    volumes:
-      - db-data:/var/lib/mysql
-      - ./db/my.cnf:/etc/mysql/conf.d/my.cnf
-      - ./init.sql:/data/application/init.sql
-    ports:
-      - 3306:3306
-
-volumes:
-  db-data:
-    driver: local

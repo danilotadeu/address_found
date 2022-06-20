@@ -1,14 +1,12 @@
 package server
 
 import (
-	"database/sql"
 	"fmt"
 	"os"
 	"os/signal"
 
-	"github.com/danilotadeu/pismo/api"
-	"github.com/danilotadeu/pismo/app"
-	"github.com/danilotadeu/pismo/store"
+	"github.com/danilotadeu/address_found/api"
+	"github.com/danilotadeu/address_found/app"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -20,8 +18,6 @@ type Server interface {
 type server struct {
 	Fiber *fiber.App
 	App   *app.Container
-	Store *store.Container
-	Db    *sql.DB
 }
 
 // New is instance the server
@@ -30,8 +26,9 @@ func New() Server {
 }
 
 func (e *server) Start() {
-	e.Store, e.Db = store.Register()
-	e.App = app.Register(e.Store)
+	e.App = app.Register(app.Options{
+		UrlViaCep: os.Getenv("URL_VIACEP"),
+	})
 	e.Fiber = api.Register(e.App)
 
 	c := make(chan os.Signal, 1)
@@ -40,7 +37,6 @@ func (e *server) Start() {
 		_ = <-c
 		fmt.Println("Gracefully shutting down...")
 		_ = e.Fiber.Shutdown()
-		_ = e.Db.Close()
 	}()
 
 	e.Fiber.Listen(":" + os.Getenv("PORT"))

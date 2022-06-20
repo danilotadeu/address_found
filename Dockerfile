@@ -11,4 +11,4 @@ RUN go build
 # Expose port
 EXPOSE 3000
 # Start app
-CMD ./pismo
+CMD ./address_found

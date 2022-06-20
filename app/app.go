@@ -3,22 +3,22 @@ package app
 import (
 	"log"
 
-	"github.com/danilotadeu/pismo/app/account"
-	"github.com/danilotadeu/pismo/app/transaction"
-	"github.com/danilotadeu/pismo/store"
+	"github.com/danilotadeu/address_found/app/address"
 )
 
 //Container ...
 type Container struct {
-	Account     account.App
-	Transaction transaction.App
+	Address address.App
+}
+
+type Options struct {
+	UrlViaCep string
 }
 
 //Register app container
-func Register(store *store.Container) *Container {
+func Register(options Options) *Container {
 	container := &Container{
-		Account:     account.NewApp(store),
-		Transaction: transaction.NewApp(store),
+		Address: address.NewApp(options.UrlViaCep),
 	}
 	log.Println("Registered -> App")
 	return container

@@ -15,13 +15,3 @@ run: ## run it will instance server
 
 run-watch: ## run-watch it will instance server with reload
 	VERSION=$(VERSION) nodemon --exec go run main.go --signal SIGTERM
-
-mock:
-	rm -rf ./mocks
-	~/go/bin/mockgen -source=./app/transaction/transaction.go -destination=./mocks/transaction_app_mock.go -package=mocks -mock_names=App=TransactionApp &
-
-migrateup:
-	migrate -path db_pismo/db/migration -database "mysql://go_test:pismo123@tcp(localhost:3306)/pismo?multiStatements=true" -verbose up
-
-migratedown:
-	migrate -path db_pismo/db/migration -database "mysql://go_test:pismo123@tcp(localhost:3306)/pismo?multiStatements=true" -verbose down
