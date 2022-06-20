@@ -26,6 +26,7 @@ func NewAPI(g fiber.Router, apps *app.Container) {
 	}
 
 	g.Post("/", api.accountCreate)
+	g.Get("/list", api.allAccounts)
 	g.Get("/:accountId", api.account)
 }
 
@@ -98,4 +99,24 @@ func (p *apiImpl) account(c *fiber.Ctx) error {
 	}
 
 	return c.Status(http.StatusOK).JSON(account)
+}
+
+func (p *apiImpl) allAccounts(c *fiber.Ctx) error {
+	ctx := context.Background()
+	accounts, err := p.apps.Account.GetAllAccounts(ctx)
+	if err != nil {
+		log.Println("api.account.account.GetAccount", err.Error())
+
+		if errors.Is(err, accountModel.ErrorAccountListIsEmpty) {
+			return c.Status(http.StatusNotFound).JSON(errorsP.ErrorsResponse{
+				Message: "Nenhuma conta cadastrada",
+			})
+		}
+
+		return c.Status(http.StatusInternalServerError).JSON(errorsP.ErrorsResponse{
+			Message: "Por favor tente mais tarde...",
+		})
+	}
+
+	return c.Status(http.StatusOK).JSON(accounts)
 }

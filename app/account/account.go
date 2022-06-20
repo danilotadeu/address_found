@@ -12,6 +12,7 @@ import (
 type App interface {
 	CreateAccount(ctx context.Context, documentNumber string) (*int64, error)
 	GetAccount(ctx context.Context, accountId int64) (*accountModel.AccountResultQuery, error)
+	GetAllAccounts(ctx context.Context) ([]*accountModel.AccountResultQuery, error)
 }
 
 type appImpl struct {
@@ -27,7 +28,6 @@ func NewApp(store *store.Container) App {
 
 //CreateAccount create a account..
 func (a *appImpl) CreateAccount(ctx context.Context, documentNumber string) (*int64, error) {
-
 	count, err := a.store.Account.GetAccountByDocumentNumber(ctx, documentNumber)
 	if err != nil {
 		log.Println("app.account.CreateAccount.GetAccountByDocumentNumber", err.Error())
@@ -54,4 +54,19 @@ func (a *appImpl) GetAccount(ctx context.Context, accountId int64) (*accountMode
 		return nil, err
 	}
 	return account, nil
+}
+
+//GetAllAccounts get aall accounts..
+func (a *appImpl) GetAllAccounts(ctx context.Context) ([]*accountModel.AccountResultQuery, error) {
+	accounts, err := a.store.Account.GetAllAccounts(ctx)
+	if err != nil {
+		log.Println("app.account.GetAccount.GetAccount", err.Error())
+		return nil, err
+	}
+
+	if len(accounts) == 0 {
+		return nil, accountModel.ErrorAccountListIsEmpty
+	}
+
+	return accounts, nil
 }

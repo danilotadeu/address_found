@@ -14,6 +14,7 @@ type Store interface {
 	StoreCreateAccount(ctx context.Context, documentNumber string) (*int64, error)
 	GetAccount(ctx context.Context, accountId int64) (*accountModel.AccountResultQuery, error)
 	GetAccountByDocumentNumber(ctx context.Context, documentNumber string) (*accountModel.AccountCountResultQuery, error)
+	GetAllAccounts(ctx context.Context) ([]*accountModel.AccountResultQuery, error)
 }
 
 type storeImpl struct {
@@ -87,4 +88,27 @@ func (a *storeImpl) GetAccountByDocumentNumber(ctx context.Context, documentNumb
 	} else {
 		return nil, accountModel.ErrorAccountNotFound
 	}
+}
+
+//GetAllAccounts get a account by document number..
+func (a *storeImpl) GetAllAccounts(ctx context.Context) ([]*accountModel.AccountResultQuery, error) {
+	res, err := a.db.Query("SELECT * FROM accounts")
+	if err != nil {
+		log.Println("store.account.GetAccountByDocumentNumber.Query", err.Error())
+		return nil, err
+	}
+	defer res.Close()
+
+	var listAccounts []*accountModel.AccountResultQuery
+
+	for res.Next() {
+		var item = accountModel.AccountResultQuery{}
+		err = res.Scan(&item.ID, &item.DocumentNumber)
+		if err != nil {
+			log.Println("store.account.GetAccountByDocumentNumber.Scan", err.Error())
+			return nil, err
+		}
+		listAccounts = append(listAccounts, &item)
+	}
+	return listAccounts, nil
 }

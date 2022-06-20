@@ -4,6 +4,7 @@ import "errors"
 
 var ErrorAccountNotFound = errors.New("Account not found")
 var ErrorAccountExists = errors.New("Account yet exists")
+var ErrorAccountListIsEmpty = errors.New("Account list is empty")
 
 //AccountRequest is a struct to create account
 type AccountRequest struct {
