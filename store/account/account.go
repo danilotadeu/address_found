@@ -85,9 +85,9 @@ func (a *storeImpl) GetAccountByDocumentNumber(ctx context.Context, documentNumb
 			return nil, err
 		}
 		return &count, nil
-	} else {
-		return nil, accountModel.ErrorAccountNotFound
 	}
+
+	return nil, accountModel.ErrorAccountNotFound
 }
 
 //GetAllAccounts get a account by document number..
