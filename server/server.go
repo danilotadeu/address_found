@@ -30,6 +30,7 @@ func New() Server {
 func (e *server) Start() {
 	e.Integrations = integrations.Register(integrations.Options{
 		UrlViaCep: os.Getenv("URL_VIACEP"),
+		UrlApiCep: os.Getenv("URL_APICEP"),
 	})
 	e.App = app.Register(e.Integrations)
 	e.Fiber = api.Register(e.App)
