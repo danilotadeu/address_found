@@ -7,6 +7,7 @@ import (
 
 	"github.com/danilotadeu/address_found/api"
 	"github.com/danilotadeu/address_found/app"
+	"github.com/danilotadeu/address_found/integrations"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -16,8 +17,9 @@ type Server interface {
 }
 
 type server struct {
-	Fiber *fiber.App
-	App   *app.Container
+	Fiber        *fiber.App
+	App          *app.Container
+	Integrations *integrations.Container
 }
 
 // New is instance the server
@@ -26,9 +28,10 @@ func New() Server {
 }
 
 func (e *server) Start() {
-	e.App = app.Register(app.Options{
+	e.Integrations = integrations.Register(integrations.Options{
 		UrlViaCep: os.Getenv("URL_VIACEP"),
 	})
+	e.App = app.Register(e.Integrations)
 	e.Fiber = api.Register(e.App)
 
 	c := make(chan os.Signal, 1)

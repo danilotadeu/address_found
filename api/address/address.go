@@ -51,16 +51,5 @@ func (p *apiImpl) zip(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.Status(http.StatusCreated).JSON(addressModel.ZipResponse{
-		Cep:         response.Cep,
-		Logradouro:  response.Logradouro,
-		Complemento: response.Complemento,
-		Bairro:      response.Bairro,
-		Localidade:  response.Localidade,
-		Uf:          response.Uf,
-		Ibge:        response.Ibge,
-		Gia:         response.Gia,
-		Ddd:         response.Ddd,
-		Siafi:       response.Siafi,
-	})
+	return c.Status(http.StatusCreated).JSON(response)
 }

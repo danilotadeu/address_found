@@ -36,3 +36,18 @@ type ZipResponse struct {
 	Ddd         string `json:"ddd"`
 	Siafi       string `json:"siafi"`
 }
+
+func TransformResult(response *ResponseViaCep) ZipResponse {
+	return ZipResponse{
+		Cep:         response.Cep,
+		Logradouro:  response.Logradouro,
+		Complemento: response.Complemento,
+		Bairro:      response.Bairro,
+		Localidade:  response.Localidade,
+		Uf:          response.Uf,
+		Ibge:        response.Ibge,
+		Gia:         response.Gia,
+		Ddd:         response.Ddd,
+		Siafi:       response.Siafi,
+	}
+}

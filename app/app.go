@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/danilotadeu/address_found/app/address"
+	"github.com/danilotadeu/address_found/integrations"
 )
 
 //Container ...
@@ -16,9 +17,9 @@ type Options struct {
 }
 
 //Register app container
-func Register(options Options) *Container {
+func Register(integrations *integrations.Container) *Container {
 	container := &Container{
-		Address: address.NewApp(options.UrlViaCep),
+		Address: address.NewApp(integrations),
 	}
 	log.Println("Registered -> App")
 	return container
