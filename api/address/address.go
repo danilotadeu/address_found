@@ -37,7 +37,7 @@ func (p *apiImpl) zip(c *fiber.Ctx) error {
 	validate := validator.New()
 	if err := validate.Struct(bodyAddress); err != nil {
 		return c.Status(http.StatusBadRequest).JSON(errorsP.ErrorsResponse{
-			Message: "O zip é obrigatório e necessita no mínimo 11 caracteres e no máximo 11 caracteres",
+			Message: "O zip é obrigatório e necessita no mínimo 8 caracteres e no máximo 8 caracteres",
 		})
 	}
 
